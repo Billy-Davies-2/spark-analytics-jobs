@@ -1,0 +1,9 @@
+[project]
+name = "spark-analytics-jobs"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "pyspark==3.5.3",
+    "pytest>=9.0.2",
+]
