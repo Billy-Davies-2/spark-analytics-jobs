@@ -269,14 +269,13 @@ class TestIcebergIntegration:
     """Tests for Iceberg write operations (mocked)."""
     
     def test_write_to_iceberg_append_mode(self, spark, sample_access_logs):
-        """Verify write uses append mode."""
+        """Verify write uses append mode when table exists."""
         route_metrics = ha.compute_route_metrics(sample_access_logs)
         
         with patch.object(route_metrics, 'writeTo') as mock_write:
             mock_writer = MagicMock()
             mock_write.return_value = mock_writer
             mock_writer.tableProperty.return_value = mock_writer
-            mock_writer.option.return_value = mock_writer
             
             ha.write_to_iceberg(route_metrics, "test.table")
             
@@ -290,9 +289,8 @@ class TestIcebergIntegration:
             mock_writer = MagicMock()
             mock_write.return_value = mock_writer
             mock_writer.tableProperty.return_value = mock_writer
-            mock_writer.option.return_value = mock_writer
-            # First call raises "table not found", second call succeeds
-            mock_writer.append.side_effect = [Exception("Table test.table not found"), None]
+            # First call (append) raises "table not found", then create succeeds
+            mock_writer.append.side_effect = Exception("Table test.table not found")
             
             ha.write_to_iceberg(route_metrics, "test.table")
             
@@ -311,6 +309,7 @@ class TestEnvironmentConfiguration:
             
             assert "nessie" in ha.NESSIE_URI.lower()
             assert "19120" in ha.NESSIE_URI
+            assert "/api/v2" in ha.NESSIE_URI
     
     def test_default_warehouse_path(self):
         """Verify default warehouse path is set correctly."""

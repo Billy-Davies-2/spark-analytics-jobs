@@ -41,7 +41,7 @@ logger = logging.getLogger("HTTPRouteAnalytics")
 
 # Environment configuration with defaults
 NESSIE_URI = os.getenv(
-    "NESSIE_URI", "http://nessie.analytics.svc.cluster.local:19120/api/v1"
+    "NESSIE_URI", "http://nessie.analytics.svc.cluster.local:19120/api/v2"
 )
 WAREHOUSE_PATH = os.getenv("WAREHOUSE_PATH", "s3a://iceberg-warehouse")
 S3_ENDPOINT = "http://candlekeep.lab.daviestechlabs.io:80"
@@ -234,32 +234,31 @@ def write_to_iceberg(df, table_name: str):
     Write DataFrame to Iceberg table using Nessie catalog.
     
     Uses append mode to preserve historical data.
+    Falls back to create if the table does not yet exist.
     Configures Iceberg format-version 2 and zstd compression.
     """
     logger.info(f"Writing to Iceberg table: {table_name}")
     
     try:
-        # Write to Iceberg table with specified options
         (
             df.writeTo(table_name)
             .tableProperty("format-version", "2")
             .tableProperty("write.parquet.compression-codec", "zstd")
-            .option("merge-schema", "true")
             .append()
         )
-        logger.info(f"Successfully wrote data to {table_name}")
+        logger.info(f"Successfully appended data to {table_name}")
         
     except Exception as e:
-        # If table doesn't exist, create it
-        if "Table" in str(e) and "not found" in str(e).lower():
-            logger.info(f"Table {table_name} does not exist, creating it")
+        error_msg = str(e).lower()
+        if "table" in error_msg and "not found" in error_msg:
+            logger.info(f"Table {table_name} does not exist, creating")
             (
                 df.writeTo(table_name)
                 .tableProperty("format-version", "2")
                 .tableProperty("write.parquet.compression-codec", "zstd")
                 .create()
             )
-            logger.info(f"Successfully created table {table_name}")
+            logger.info(f"Successfully created {table_name}")
         else:
             raise
 
