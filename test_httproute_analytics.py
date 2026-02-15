@@ -325,7 +325,7 @@ class TestEnvironmentConfiguration:
         assert "clickhouse" in ha.CLICKHOUSE_JDBC_URL.lower()
         assert "8123" in ha.CLICKHOUSE_JDBC_URL
         assert ha.CLICKHOUSE_TABLE == "envoy_access_logs"
-        assert ha.CLICKHOUSE_USER == "default"
+        assert ha.CLICKHOUSE_USER == "analytics"
 
 
 class TestWindowAggregation:

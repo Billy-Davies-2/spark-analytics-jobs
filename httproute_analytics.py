@@ -48,10 +48,13 @@ S3_ENDPOINT = "http://candlekeep.lab.daviestechlabs.io:80"
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 
 # ClickHouse configuration
-CLICKHOUSE_JDBC_URL = "jdbc:clickhouse://clickhouse.analytics.svc.cluster.local:8123/logs"
-CLICKHOUSE_TABLE = "envoy_access_logs"
-CLICKHOUSE_USER = "default"
-CLICKHOUSE_PASSWORD = ""
+CLICKHOUSE_JDBC_URL = os.getenv(
+    "CLICKHOUSE_JDBC_URL",
+    "jdbc:clickhouse://clickhouse.analytics.svc.cluster.local:8123/logs",
+)
+CLICKHOUSE_TABLE = os.getenv("CLICKHOUSE_TABLE", "envoy_access_logs")
+CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER", "analytics")
+CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "")
 
 # Output table names
 ROUTE_METRICS_TABLE = "nessie.httproute_analytics.route_metrics"
