@@ -289,8 +289,10 @@ class TestIcebergIntegration:
             mock_writer = MagicMock()
             mock_write.return_value = mock_writer
             mock_writer.tableProperty.return_value = mock_writer
-            # First call (append) raises "table not found", then create succeeds
-            mock_writer.append.side_effect = Exception("Table test.table not found")
+            # First call (append) raises TABLE_OR_VIEW_NOT_FOUND, then create succeeds
+            mock_writer.append.side_effect = Exception(
+                "[TABLE_OR_VIEW_NOT_FOUND] The table or view `test`.`table` cannot be found."
+            )
             
             ha.write_to_iceberg(route_metrics, "test.table")
             

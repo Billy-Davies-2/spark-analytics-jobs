@@ -253,7 +253,9 @@ def write_to_iceberg(df, table_name: str):
         
     except Exception as e:
         error_msg = str(e).lower()
-        if "table" in error_msg and "not found" in error_msg:
+        if "table_or_view_not_found" in error_msg or (
+            "table" in error_msg and "not_found" in error_msg
+        ):
             logger.info(f"Table {table_name} does not exist, creating")
             (
                 df.writeTo(table_name)
